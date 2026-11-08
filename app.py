@@ -172,6 +172,38 @@ def get_all_courses():
         ), 500
 
 
+@app.get("/api/courses/stats")
+def get_course_stats():
+    """Return the total number of courses and counts by status."""
+    try:
+        courses = load_courses()
+
+        courses_by_status = {
+            status: sum(
+                1
+                for course in courses
+                if course.get("status") == status
+            )
+            for status in VALID_STATUSES
+        }
+
+        return jsonify(
+            {
+                "success": True,
+                "total_courses": len(courses),
+                "courses_by_status": courses_by_status,
+            }
+        ), 200
+
+    except (OSError, ValueError) as error:
+        return jsonify(
+            {
+                "success": False,
+                "error": str(error),
+            }
+        ), 500
+
+
 @app.get("/api/courses/<int:course_id>")
 def get_course(course_id):
     """Return one course identified by its ID."""

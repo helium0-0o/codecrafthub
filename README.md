@@ -186,6 +186,16 @@ The API base URL is:
 http://127.0.0.1:5000
 ```
 
+### Get course statistics
+
+**Method:** `GET`  
+**Endpoint:** `/api/courses/stats`
+
+Returns the total number of courses and a count for each allowed status.
+
+```bash
+curl -i http://127.0.0.1:5000/api/courses/stats
+
 ### Create a course
 
 **Method:** `POST`  
