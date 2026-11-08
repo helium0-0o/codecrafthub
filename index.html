@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeCraftHub: Your Learning Management Platform</title>
+  <style>
+    :root {
+      --primary: #8b5cf6;
+      --primary-dark: #7c3aed;
+      --primary-light: #ede9fe;
+      --accent: #f59e0b;
+      --accent-dark: #d97706;
+      --danger: #ef4444;
+      --danger-dark: #dc2626;
+      --bg: #f8f7fc;
+      --surface: #ffffff;
+      --text: #1f1b2e;
+      --muted: #6b6582;
+      --border: #e5e0f0;
+      --focus: #c4b5fd;
+      --shadow: 0 1px 3px rgba(31, 27, 46, 0.08), 0 1px 2px rgba(31, 27, 46, 0.06);
+      --shadow-lg: 0 10px 25px rgba(31, 27, 46, 0.15), 0 4px 10px rgba(31, 27, 46, 0.08);
+      --radius: 10px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      z-index: 1000;
+      padding: 10px 18px;
+      border-radius: 0 0 var(--radius) 0;
+      background: var(--primary);
+      color: white;
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .skip-link:focus { left: 0; }
+
+    .site-header {
+      padding: 36px 24px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      box-shadow: var(--shadow);
+    }
+    .site-header h1 {
+      font-size: clamp(1.5rem, 4vw, 2.25rem);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+    .site-header p { margin-top: 6px; opacity: 0.92; }
+
+    main { max-width: 1100px; margin: 0 auto; padding: 28px 20px 60px; }
+
+    section {
+      margin-bottom: 24px;
+      overflow: hidden;
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-header h2 { font-size: 1.15rem; }
+
+    .count-badge {
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .form-body { padding: 22px; }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    .form-field { display: flex; flex-direction: column; gap: 6px; }
+    .form-field.full { grid-column: 1 / -1; }
+
+    label { font-size: 0.85rem; font-weight: 700; }
+    .req { color: var(--danger); }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: white;
+      color: var(--text);
+      font: inherit;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    textarea { min-height: 80px; resize: vertical; }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.18);
+    }
+
+    .field-error { display: none; color: var(--danger); font-size: 0.78rem; font-weight: 600; }
+    .field-error.show { display: block; }
+
+    .form-actions, .modal-footer, .row-actions, .card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .form-actions { margin-top: 20px; }
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border: 0;
+      border-radius: 8px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.05s, box-shadow 0.15s;
+    }
+    button:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--focus); }
+    button:active:not(:disabled) { transform: translateY(1px); }
+    button:disabled { cursor: not-allowed; opacity: 0.6; }
+
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover:not(:disabled) { background: var(--primary-dark); }
+    .btn-accent { background: var(--accent); color: var(--text); }
+    .btn-accent:hover:not(:disabled) { background: var(--accent-dark); color: white; }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-danger:hover:not(:disabled) { background: var(--danger-dark); }
+    .btn-ghost { background: transparent; color: var(--text); border: 1.5px solid var(--border); }
+    .btn-ghost:hover:not(:disabled) { border-color: var(--primary); color: var(--primary-dark); }
+
+    .message-bar {
+      display: none;
+      margin-bottom: 24px;
+      padding: 14px 18px;
+      border-radius: var(--radius);
+      font-weight: 600;
+    }
+    .message-bar.show { display: block; }
+    .message-success { border: 1px solid #a7f3d0; background: #ecfdf5; color: #065f46; }
+    .message-error { border: 1px solid #fecaca; background: #fef2f2; color: #991b1b; }
+
+    .table-wrap { width: 100%; overflow-x: auto; }
+    table { width: 100%; min-width: 760px; border-collapse: collapse; }
+    th, td { padding: 14px 16px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border); }
+    th {
+      background: #faf8fe;
+      color: var(--muted);
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    tbody tr:hover { background: #fcfaff; }
+    .course-name { font-weight: 700; }
+    .course-desc { max-width: 310px; color: var(--muted); font-size: 0.88rem; }
+    .course-id, .course-created { color: var(--muted); font-size: 0.85rem; }
+
+    .status-pill {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      white-space: nowrap;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+    .status-not-started { background: #fee2e2; color: #991b1b; }
+    .status-in-progress { background: #fef3c7; color: #92400e; }
+    .status-completed { background: #d1fae5; color: #065f46; }
+
+    .loading-state, .empty-state {
+      padding: 52px 20px;
+      text-align: center;
+      color: var(--muted);
+    }
+    .loading-state { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+    .empty-state h3 { color: var(--text); margin-bottom: 6px; }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2.5px solid rgba(255, 255, 255, 0.45);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    .loading-state .spinner {
+      width: 32px;
+      height: 32px;
+      border-color: var(--border);
+      border-top-color: var(--primary);
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .cards-list { display: none; flex-direction: column; gap: 16px; padding: 20px; }
+    .course-card { padding: 18px; border: 1px solid var(--border); border-radius: var(--radius); }
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .card-name { font-size: 1.05rem; font-weight: 800; }
+    .card-id, .card-meta, .card-desc { color: var(--muted); font-size: 0.86rem; }
+    .card-desc { margin: 10px 0; }
+    .card-meta { display: flex; flex-direction: column; gap: 4px; margin-bottom: 14px; }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(31, 27, 46, 0.55);
+    }
+    .overlay.show { display: flex; }
+    .modal {
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 14px;
+      background: white;
+      box-shadow: var(--shadow-lg);
+    }
+    .modal-header, .modal-footer { padding: 18px 24px; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+    .modal-body { padding: 24px; }
+    .modal-footer { justify-content: flex-end; border-top: 1px solid var(--border); }
+    .modal-close { padding: 4px 8px; background: transparent; color: var(--muted); font-size: 1.5rem; }
+    .modal-readonly {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 18px;
+      padding: 14px;
+      border-radius: 8px;
+      background: #faf8fe;
+    }
+    .modal-readonly > div { flex: 1; }
+    .readonly-label { color: var(--muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+    .readonly-value { margin-top: 2px; font-weight: 700; }
+
+    .site-footer { padding: 24px; text-align: center; color: var(--muted); font-size: 0.85rem; }
+
+    @media (max-width: 767px) {
+      .table-wrap { display: none; }
+      .cards-list { display: flex; }
+      .form-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="site-header">
+    <h1>CodeCraftHub: Your Learning Management Platform</h1>
+    <p>Plan, track, and complete your learning journey, all in one place.</p>
+  </header>
+
+  <main id="main">
+    <div id="messageBar" class="message-bar" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <section aria-labelledby="add-heading">
+      <div class="section-header"><h2 id="add-heading">Add a New Course</h2></div>
+      <form id="addForm" novalidate>
+        <div class="form-body">
+          <div class="form-grid">
+            <div class="form-field full">
+              <label for="add-name">Course Name <span class="req" aria-hidden="true">*</span></label>
+              <input id="add-name" name="name" type="text" autocomplete="off" aria-describedby="add-name-err">
+              <span id="add-name-err" class="field-error" role="alert"></span>
+            </div>
+            <div class="form-field full">
+              <label for="add-description">Description <span class="req" aria-hidden="true">*</span></label>
+              <textarea id="add-description" name="description" aria-describedby="add-desc-err"></textarea>
+              <span id="add-desc-err" class="field-error" role="alert"></span>
+            </div>
+            <div class="form-field">
+              <label for="add-target-date">Target Date <span class="req" aria-hidden="true">*</span></label>
+              <input id="add-target-date" name="target_date" type="date" aria-describedby="add-date-err">
+              <span id="add-date-err" class="field-error" role="alert"></span>
+            </div>
+            <div class="form-field">
+              <label for="add-status">Status <span class="req" aria-hidden="true">*</span></label>
+              <select id="add-status" name="status" aria-describedby="add-status-err">
+                <option value="">Select a status</option>
+                <option value="Not Started">Not Started</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+              </select>
+              <span id="add-status-err" class="field-error" role="alert"></span>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button id="addSubmit" class="btn-primary" type="submit"><span id="addSubmitText">Add Course</span></button>
+            <button id="addReset" class="btn-ghost" type="reset">Clear</button>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <section aria-labelledby="list-heading">
+      <div class="section-header">
+        <h2 id="list-heading">Your Courses</h2>
+        <span id="countBadge" class="count-badge">0 courses</span>
+      </div>
+      <div id="listContainer">
+        <div class="loading-state">
+          <div class="spinner" role="status" aria-label="Loading courses"></div>
+          <span>Loading courses...</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">CodeCraftHub Learning Management Platform</footer>
+
+  <div id="editOverlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="edit-heading" hidden>
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="edit-heading">Edit Course</h2>
+        <button id="editCloseBtn" class="modal-close" type="button" aria-label="Close edit dialog">&times;</button>
+      </div>
+      <form id="editForm" novalidate>
+        <div class="modal-body">
+          <div class="modal-readonly">
+            <div><div class="readonly-label">ID</div><div id="edit-id-display" class="readonly-value">-</div></div>
+            <div><div class="readonly-label">Created</div><div id="edit-created-display" class="readonly-value">-</div></div>
+          </div>
+          <input id="edit-id" name="id" type="hidden">
+          <div class="form-grid">
+            <div class="form-field full">
+              <label for="edit-name">Course Name <span class="req" aria-hidden="true">*</span></label>
+              <input id="edit-name" name="name" type="text" autocomplete="off" aria-describedby="edit-name-err">
+              <span id="edit-name-err" class="field-error" role="alert"></span>
+            </div>
+            <div class="form-field full">
+              <label for="edit-description">Description <span class="req" aria-hidden="true">*</span></label>
+              <textarea id="edit-description" name="description" aria-describedby="edit-desc-err"></textarea>
+              <span id="edit-desc-err" class="field-error" role="alert"></span>
+            </div>
+            <div class="form-field">
+              <label for="edit-target-date">Target Date <span class="req" aria-hidden="true">*</span></label>
+              <input id="edit-target-date" name="target_date" type="date" aria-describedby="edit-date-err">
+              <span id="edit-date-err" class="field-error" role="alert"></span>
+            </div>
+            <div class="form-field">
+              <label for="edit-status">Status <span class="req" aria-hidden="true">*</span></label>
+              <select id="edit-status" name="status" aria-describedby="edit-status-err">
+                <option value="">Select a status</option>
+                <option value="Not Started">Not Started</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+              </select>
+              <span id="edit-status-err" class="field-error" role="alert"></span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="editCancelBtn" class="btn-ghost" type="button">Cancel</button>
+          <button id="editSubmit" class="btn-accent" type="submit"><span id="editSubmitText">Save Changes</span></button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      const API_URL = "http://127.0.0.1:5000/api/courses";
+      const VALID_STATUSES = ["Not Started", "In Progress", "Completed"];
+
+      const messageBar = document.getElementById("messageBar");
+      const listContainer = document.getElementById("listContainer");
+      const countBadge = document.getElementById("countBadge");
+      const addForm = document.getElementById("addForm");
+      const addSubmitBtn = document.getElementById("addSubmit");
+      const addSubmitText = document.getElementById("addSubmitText");
+      const addResetBtn = document.getElementById("addReset");
+      const overlay = document.getElementById("editOverlay");
+      const editForm = document.getElementById("editForm");
+      const editSubmitBtn = document.getElementById("editSubmit");
+      const editSubmitText = document.getElementById("editSubmitText");
+      const editCloseBtn = document.getElementById("editCloseBtn");
+      const editCancelBtn = document.getElementById("editCancelBtn");
+
+      let isBusy = false;
+      let lastFocusedElement = null;
+
+      function el(tag, opts, children) {
+        const node = document.createElement(tag);
+        opts = opts || {};
+
+        if (opts.className) node.className = opts.className;
+        if (opts.text != null) node.textContent = opts.text;
+
+        if (opts.attrs) {
+          for (const key in opts.attrs) {
+            if (Object.prototype.hasOwnProperty.call(opts.attrs, key)) {
+              node.setAttribute(key, opts.attrs[key]);
+            }
+          }
+        }
+
+        const childNodes = children || opts.children || [];
+        for (let i = 0; i < childNodes.length; i++) node.appendChild(childNodes[i]);
+        return node;
+      }
+
+      function statusClass(status) {
+        return "status-" + String(status || "")
+          .trim()
+          .toLowerCase()
+          .replace(/\s+/g, "-")
+          .replace(/[^a-z-]/g, "");
+      }
+
+      function formatDate(value) {
+        if (!value) return "-";
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return String(value);
+        return date.toLocaleString(undefined, {
+          year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
+        });
+      }
+
+      function showMessage(type, text) {
+        messageBar.textContent = text;
+        messageBar.className = "message-bar show " + (type === "success" ? "message-success" : "message-error");
+        if (type === "success") {
+          window.setTimeout(function () {
+            if (messageBar.textContent === text) {
+              messageBar.className = "message-bar";
+              messageBar.textContent = "";
+            }
+          }, 5000);
+        }
+      }
+
+      function clearMessage() {
+        messageBar.className = "message-bar";
+        messageBar.textContent = "";
+      }
+
+      function setBusy(busy) {
+        isBusy = busy;
+        addSubmitBtn.disabled = busy;
+        addResetBtn.disabled = busy;
+        editSubmitBtn.disabled = busy;
+        editCancelBtn.disabled = busy;
+        editCloseBtn.disabled = busy;
+      }
+
+      function makeSpinner() {
+        return el("span", { className: "spinner", attrs: { "aria-hidden": "true" } });
+      }
+
+      function resetSubmitButton(button, textNode, text) {
+        const spinner = button.querySelector(".spinner");
+        if (spinner) spinner.remove();
+        textNode.textContent = text;
+      }
+
+      function clearFieldErrors(form) {
+        form.querySelectorAll(".field-error").forEach(function (error) {
+          error.classList.remove("show");
+          error.textContent = "";
+        });
+      }
+
+      function validateForm(values, prefix) {
+        const errors = {
+          name: document.getElementById(prefix + "-name-err"),
+          description: document.getElementById(prefix + "-desc-err"),
+          target_date: document.getElementById(prefix + "-date-err"),
+          status: document.getElementById(prefix + "-status-err")
+        };
+
+        Object.values(errors).forEach(function (error) {
+          error.classList.remove("show");
+          error.textContent = "";
+        });
+
+        let valid = true;
+        if (!values.name.trim()) {
+          errors.name.textContent = "Course name is required.";
+          errors.name.classList.add("show");
+          valid = false;
+        }
+        if (!values.description.trim()) {
+          errors.description.textContent = "Description is required.";
+          errors.description.classList.add("show");
+          valid = false;
+        }
+        if (!values.target_date) {
+          errors.target_date.textContent = "Target date is required.";
+          errors.target_date.classList.add("show");
+          valid = false;
+        } else if (!/^\d{4}-\d{2}-\d{2}$/.test(values.target_date)) {
+          errors.target_date.textContent = "Date must use YYYY-MM-DD.";
+          errors.target_date.classList.add("show");
+          valid = false;
+        }
+        if (!VALID_STATUSES.includes(values.status)) {
+          errors.status.textContent = "Please select a valid status.";
+          errors.status.classList.add("show");
+          valid = false;
+        }
+        return valid;
+      }
+
+      async function apiRequest(method, url, body) {
+        const options = { method: method, headers: {} };
+        if (body !== undefined) {
+          options.headers["Content-Type"] = "application/json";
+          options.body = JSON.stringify(body);
+        }
+
+        let response;
+        try {
+          response = await fetch(url, options);
+        } catch (error) {
+          throw new Error("Network error: could not reach the API. Confirm that Flask is running on 127.0.0.1:5000.");
+        }
+
+        let data;
+        try {
+          const text = await response.text();
+          data = text ? JSON.parse(text) : null;
+        } catch (error) {
+          throw new Error("The API returned an invalid JSON response.");
+        }
+
+        if (!response.ok) {
+          throw new Error(data && data.error ? data.error : "Request failed with status " + response.status + ".");
+        }
+        if (!data || typeof data !== "object") throw new Error("The API returned an empty response.");
+        if (data.success === false) throw new Error(data.error || "The request was not successful.");
+        return data;
+      }
+
+      async function fetchCourses() {
+        const data = await apiRequest("GET", API_URL);
+        if (!Array.isArray(data.courses)) throw new Error("The API response does not contain a courses array.");
+        return data.courses;
+      }
+
+      function renderLoading() {
+        listContainer.replaceChildren(el("div", { className: "loading-state" }, [
+          el("div", { className: "spinner", attrs: { role: "status", "aria-label": "Loading courses" } }),
+          el("span", { text: "Loading courses..." })
+        ]));
+      }
+
+      function renderEmpty() {
+        countBadge.textContent = "0 courses";
+        listContainer.replaceChildren(el("div", { className: "empty-state" }, [
+          el("h3", { text: "No courses yet" }),
+          el("p", { text: "Add your first course using the form above." })
+        ]));
+      }
+
+      function createActionButtons(course) {
+        const editButton = el("button", {
+          className: "btn-primary", text: "Edit",
+          attrs: { type: "button", "aria-label": "Edit course " + (course.name || "") }
+        });
+        const removeButton = el("button", {
+          className: "btn-danger", text: "Remove",
+          attrs: { type: "button", "aria-label": "Remove course " + (course.name || "") }
+        });
+        editButton.addEventListener("click", function () { openEdit(course); });
+        removeButton.addEventListener("click", function () { handleDelete(course); });
+        return [editButton, removeButton];
+      }
+
+      function buildRow(course) {
+        const actions = createActionButtons(course);
+        return el("tr", {}, [
+          el("td", { className: "course-id", text: String(course.id) }),
+          el("td", {}, [el("div", { className: "course-name", text: course.name || "" })]),
+          el("td", {}, [el("div", { className: "course-desc", text: course.description || "" })]),
+          el("td", { text: course.target_date || "" }),
+          el("td", {}, [el("span", { className: "status-pill " + statusClass(course.status), text: course.status || "" })]),
+          el("td", { className: "course-created", text: formatDate(course.created_at) }),
+          el("td", {}, [el("div", { className: "row-actions" }, actions)])
+        ]);
+      }
+
+      function buildCard(course) {
+        const actions = createActionButtons(course);
+        return el("article", { className: "course-card" }, [
+          el("div", { className: "card-top" }, [
+            el("div", {}, [
+              el("div", { className: "card-name", text: course.name || "" }),
+              el("div", { className: "card-id", text: "ID: " + course.id })
+            ]),
+            el("span", { className: "status-pill " + statusClass(course.status), text: course.status || "" })
+          ]),
+          el("div", { className: "card-desc", text: course.description || "" }),
+          el("div", { className: "card-meta" }, [
+            el("span", { text: "Target date: " + (course.target_date || "-") }),
+            el("span", { text: "Created: " + formatDate(course.created_at) })
+          ]),
+          el("div", { className: "card-actions" }, actions)
+        ]);
+      }
+
+      function renderCourses(courses) {
+        countBadge.textContent = courses.length + (courses.length === 1 ? " course" : " courses");
+
+        const headings = ["ID", "Name", "Description", "Target Date", "Status", "Created", "Actions"];
+        const headerRow = el("tr", {}, headings.map(function (heading) { return el("th", { text: heading }); }));
+        const tbody = el("tbody");
+        courses.forEach(function (course) { tbody.appendChild(buildRow(course)); });
+
+        const table = el("table", {}, [el("thead", {}, [headerRow]), tbody]);
+        const tableWrap = el("div", { className: "table-wrap" }, [table]);
+        const cardsList = el("div", { className: "cards-list" });
+        courses.forEach(function (course) { cardsList.appendChild(buildCard(course)); });
+
+        listContainer.replaceChildren(tableWrap, cardsList);
+      }
+
+      async function loadCourses(showLoading) {
+        if (showLoading) {
+          clearMessage();
+          renderLoading();
+        }
+        try {
+          const courses = await fetchCourses();
+          courses.length ? renderCourses(courses) : renderEmpty();
+        } catch (error) {
+          countBadge.textContent = "0 courses";
+          listContainer.replaceChildren(el("div", { className: "empty-state" }, [
+            el("h3", { text: "Could not load courses" }),
+            el("p", { text: error.message })
+          ]));
+          showMessage("error", error.message);
+        }
+      }
+
+      addForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        if (isBusy) return;
+        clearMessage();
+
+        const values = {
+          name: document.getElementById("add-name").value,
+          description: document.getElementById("add-description").value,
+          target_date: document.getElementById("add-target-date").value,
+          status: document.getElementById("add-status").value
+        };
+        if (!validateForm(values, "add")) return;
+
+        setBusy(true);
+        addSubmitBtn.insertBefore(makeSpinner(), addSubmitBtn.firstChild);
+        addSubmitText.textContent = "Adding...";
+        try {
+          await apiRequest("POST", API_URL, {
+            name: values.name.trim(),
+            description: values.description.trim(),
+            target_date: values.target_date,
+            status: values.status
+          });
+          addForm.reset();
+          clearFieldErrors(addForm);
+          showMessage("success", "Course added successfully.");
+          await loadCourses(false);
+        } catch (error) {
+          showMessage("error", error.message);
+        } finally {
+          resetSubmitButton(addSubmitBtn, addSubmitText, "Add Course");
+          setBusy(false);
+        }
+      });
+
+      addResetBtn.addEventListener("click", function () {
+        clearFieldErrors(addForm);
+        clearMessage();
+      });
+
+      function openEdit(course) {
+        if (isBusy) return;
+        lastFocusedElement = document.activeElement;
+        document.getElementById("edit-id").value = course.id;
+        document.getElementById("edit-id-display").textContent = String(course.id);
+        document.getElementById("edit-created-display").textContent = formatDate(course.created_at);
+        document.getElementById("edit-name").value = course.name || "";
+        document.getElementById("edit-description").value = course.description || "";
+        document.getElementById("edit-target-date").value = course.target_date || "";
+        document.getElementById("edit-status").value = course.status || "";
+        clearFieldErrors(editForm);
+        overlay.hidden = false;
+        overlay.classList.add("show");
+        document.getElementById("edit-name").focus();
+      }
+
+      function closeEdit() {
+        overlay.classList.remove("show");
+        overlay.hidden = true;
+        clearFieldErrors(editForm);
+        if (lastFocusedElement && typeof lastFocusedElement.focus === "function") lastFocusedElement.focus();
+      }
+
+      editCloseBtn.addEventListener("click", closeEdit);
+      editCancelBtn.addEventListener("click", closeEdit);
+      overlay.addEventListener("click", function (event) { if (event.target === overlay) closeEdit(); });
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && overlay.classList.contains("show")) closeEdit();
+      });
+
+      editForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        if (isBusy) return;
+        clearMessage();
+
+        const id = document.getElementById("edit-id").value;
+        const values = {
+          name: document.getElementById("edit-name").value,
+          description: document.getElementById("edit-description").value,
+          target_date: document.getElementById("edit-target-date").value,
+          status: document.getElementById("edit-status").value
+        };
+        if (!validateForm(values, "edit")) return;
+
+        setBusy(true);
+        editSubmitBtn.insertBefore(makeSpinner(), editSubmitBtn.firstChild);
+        editSubmitText.textContent = "Saving...";
+        try {
+          await apiRequest("PUT", API_URL + "/" + encodeURIComponent(id), {
+            name: values.name.trim(),
+            description: values.description.trim(),
+            target_date: values.target_date,
+            status: values.status
+          });
+          closeEdit();
+          showMessage("success", "Course updated successfully.");
+          await loadCourses(false);
+        } catch (error) {
+          showMessage("error", error.message);
+        } finally {
+          resetSubmitButton(editSubmitBtn, editSubmitText, "Save Changes");
+          setBusy(false);
+        }
+      });
+
+      async function handleDelete(course) {
+        if (isBusy) return;
+        if (!window.confirm('Remove "' + (course.name || "this course") + '"? This cannot be undone.')) return;
+
+        clearMessage();
+        setBusy(true);
+        try {
+          await apiRequest("DELETE", API_URL + "/" + encodeURIComponent(course.id));
+          showMessage("success", "Course removed successfully.");
+          await loadCourses(false);
+        } catch (error) {
+          showMessage("error", error.message);
+        } finally {
+          setBusy(false);
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", function () { loadCourses(true); });
+    })();
+  </script>
+</body>
+</html>
